@@ -21,3 +21,7 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# File panduan lokal (tidak di-upload ke GitHub)
+PANDUAN_DEMO.md
+README_MODUL4.md
