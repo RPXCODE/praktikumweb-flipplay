@@ -1,0 +1,290 @@
+{
+	"info": {
+		"_postman_id": "flipplay-modul4-api-collection",
+		"name": "FlipPlay REST API - Modul 4",
+		"description": "Koleksi Postman resmi untuk Demo Modul 4 FlipPlay REST API (Laravel 12). Mencakup seluruh skenario CRUD, Relasi Eloquent, Eager Loading (whenLoaded), Form Request Validation (Error 422), dan Custom Action (Attach/Detach Relasi Koleksi).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000/api",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Media (CRUD & Filter)",
+			"item": [
+				{
+					"name": "1. GET - Tampilkan Semua Media (Index)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/media",
+							"host": ["{{base_url}}"],
+							"path": ["media"]
+						},
+						"description": "Menampilkan daftar seluruh media yang ada di katalog FlipPlay dengan pagination dan API Resource."
+					}
+				},
+				{
+					"name": "2. GET - Cari Media Berdasarkan Judul (Query Filter)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/media?title=Inception",
+							"host": ["{{base_url}}"],
+							"path": ["media"],
+							"query": [
+								{ "key": "title", "value": "Inception" }
+							]
+						},
+						"description": "Skenario alur pencarian media berdasarkan kata kunci judul."
+					}
+				},
+				{
+					"name": "3. POST - Tambah Media Movie Baru (Happy Path - 201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Dune: Part Two\",\n    \"type\": \"movie\",\n    \"genre\": \"Sci-Fi\",\n    \"duration_minutes\": 166,\n    \"release_year\": 2024,\n    \"director\": \"Denis Villeneuve\",\n    \"age_rating\": \"PG-13\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/media",
+							"host": ["{{base_url}}"],
+							"path": ["media"]
+						},
+						"description": "Menambahkan film baru ke sistem. Berhasil dengan status code 201 Created."
+					}
+				},
+				{
+					"name": "4. POST - Tambah Media Musik Baru (Happy Path - 201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Yellow\",\n    \"type\": \"music\",\n    \"genre\": \"Alternative Rock\",\n    \"duration_minutes\": 5,\n    \"release_year\": 2000,\n    \"artist\": \"Coldplay\",\n    \"album\": \"Parachutes\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/media",
+							"host": ["{{base_url}}"],
+							"path": ["media"]
+						},
+						"description": "Menambahkan musik baru ke sistem. Berhasil dengan status code 201 Created."
+					}
+				},
+				{
+					"name": "5. POST - Tambah Media Judul Kosong (Failure Path - 422)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"\",\n    \"type\": \"movie\",\n    \"genre\": \"Action\",\n    \"duration_minutes\": 120,\n    \"release_year\": 2024\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/media",
+							"host": ["{{base_url}}"],
+							"path": ["media"]
+						},
+						"description": "Validasi Form Request ketika judul kosong. Mengembalikan respons 422 Unprocessable Content."
+					}
+				},
+				{
+					"name": "6. POST - Tambah Media Judul Duplikat (Failure Path - 422)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Inception\",\n    \"type\": \"movie\",\n    \"genre\": \"Sci-Fi\",\n    \"duration_minutes\": 148,\n    \"release_year\": 2010\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/media",
+							"host": ["{{base_url}}"],
+							"path": ["media"]
+						},
+						"description": "Validasi Form Request judul unik. Mengembalikan 422 karena judul 'Inception' sudah ada di database."
+					}
+				},
+				{
+					"name": "7. GET - Detail Media beserta Kolektor Pengguna (Show with whenLoaded - 200)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/media/1",
+							"host": ["{{base_url}}"],
+							"path": ["media", "1"]
+						},
+						"description": "Menampilkan detail media ID 1 beserta data pengguna yang mengoleksinya melalui eager loading (whenLoaded)."
+					}
+				},
+				{
+					"name": "8. PUT - Perbarui Media (Update - 200)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"genre\": \"Sci-Fi & Mind-Bending\",\n    \"duration_minutes\": 150\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/media/1",
+							"host": ["{{base_url}}"],
+							"path": ["media", "1"]
+						},
+						"description": "Memperbarui genre dan durasi media ID 1."
+					}
+				},
+				{
+					"name": "9. DELETE - Hapus Media (Destroy - 200)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/media/6",
+							"host": ["{{base_url}}"],
+							"path": ["media", "6"]
+						},
+						"description": "Menghapus media ID 6 dari katalog."
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Pengguna & Koleksi (Custom Actions)",
+			"item": [
+				{
+					"name": "1. GET - Daftar Pengguna",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": ["{{base_url}}"],
+							"path": ["users"]
+						},
+						"description": "Menampilkan seluruh user beserta total jumlah koleksi media yang dimiliki."
+					}
+				},
+				{
+					"name": "2. GET - Tampilkan Koleksi Media Pengguna (whenLoaded - 200)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/users/1/collection",
+							"host": ["{{base_url}}"],
+							"path": ["users", "1", "collection"]
+						},
+						"description": "Menampilkan daftar media yang dimasukkan oleh pengguna ID 1 ke koleksi pribadinya."
+					}
+				},
+				{
+					"name": "3. POST - Tambah Media ke Koleksi (Custom Action Attach - 201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"media_id\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/1/collection",
+							"host": ["{{base_url}}"],
+							"path": ["users", "1", "collection"]
+						},
+						"description": "Menambahkan media ID 3 (Spirited Away) ke koleksi pengguna ID 1."
+					}
+				},
+				{
+					"name": "4. POST - Tambah Media Duplikat ke Koleksi (Failure Path - 422)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"media_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/1/collection",
+							"host": ["{{base_url}}"],
+							"path": ["users", "1", "collection"]
+						},
+						"description": "Mencoba menambahkan media ID 1 (Inception) yang sudah ada di koleksi pengguna 1. Mengembalikan respon error 422."
+					}
+				},
+				{
+					"name": "5. DELETE - Hapus Media dari Koleksi (Custom Action Detach - 200)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/users/1/collection/1",
+							"host": ["{{base_url}}"],
+							"path": ["users", "1", "collection", "1"]
+						},
+						"description": "Menghapus media ID 1 dari koleksi pengguna ID 1."
+					}
+				},
+				{
+					"name": "6. DELETE - Hapus Media yang Tidak Ada di Koleksi (Failure Path - 404)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/users/1/collection/9999",
+							"host": ["{{base_url}}"],
+							"path": ["users", "1", "collection", "9999"]
+						},
+						"description": "Menghapus media dengan ID yang tidak ada di koleksi pengguna. Mengembalikan 404 Not Found."
+					}
+				}
+			]
+		}
+	]
+}
